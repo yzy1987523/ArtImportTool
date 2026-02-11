@@ -1,0 +1,8 @@
+{
+  "DatabasePath": "\\\\CompanyServer\\SharedAssets\\art_asset_manager.db",
+  "IsSharedDatabase": true,
+  "ProjectName": "MyUnityProject",
+  "ProjectPath": "Assets",
+  "ConnectionTimeout": 30,
+  "ReadOnly": false
+}

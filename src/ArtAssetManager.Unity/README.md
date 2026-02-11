@@ -53,6 +53,26 @@ YourUnityProject/
 
 ## 使用方法
 
+### 配置数据库
+
+在Unity编辑器中，选择菜单：
+```
+Window > Art Asset Manager > Database Config
+```
+
+#### 本地模式（默认）
+- 数据库文件位于Unity项目根目录
+- 每个Unity项目有独立的数据库
+- 适合单人开发或小型项目
+
+#### 共享模式（公司级）
+- 数据库文件位于公司共享位置（网络驱动器或服务器）
+- 多个Unity项目共享同一个数据库
+- 通过项目名称隔离不同项目的数据
+- 适合团队协作和资源复用
+
+配置文件位置：`YourUnityProject/database-config.json`
+
 ### 打开资源浏览器
 
 在Unity编辑器中，选择菜单：
@@ -145,6 +165,139 @@ Window > Art Asset Manager > Style Upload
 - ✅ 风格化资源上传（StyleUploadWindow）
 - ✅ 批量操作支持
 - ✅ 历史记录查看
+- ✅ 数据库配置窗口（DatabaseConfigWindow）
+- ✅ 共享数据库支持（公司级）
+- ✅ 本地/共享模式切换
+
+## 共享数据库部署指南
+
+### 场景1：公司级共享数据库
+
+适用于多个Unity项目需要共享艺术资源的场景。
+
+#### 步骤1：准备共享位置
+在公司网络驱动器或文件服务器上创建共享文件夹：
+```
+\\CompanyServer\SharedAssets\
+```
+
+#### 步骤2：初始化共享数据库
+在任意一台电脑上运行控制台工具初始化数据库：
+```powershell
+cd src/ArtAssetManager.Console
+dotnet run -- init --path "\\CompanyServer\SharedAssets\art_asset_manager.db"
+```
+
+#### 步骤3：导入资源到共享数据库
+```powershell
+dotnet run -- import --path "\\CompanyServer\SharedAssets\art_asset_manager.db" --source "C:\ArtAssets"
+```
+
+#### 步骤4：在Unity项目中配置
+在每个Unity项目中：
+1. 打开 `Window > Art Asset Manager > Database Config`
+2. 选择 "Shared Database (Company-level)"
+3. 设置数据库路径：`\\CompanyServer\SharedAssets\art_asset_manager.db`
+4. 设置项目名称（用于隔离不同项目）：如 "ProjectA"、"ProjectB"
+5. 点击 "Test Connection" 验证连接
+6. 点击 "Save Configuration"
+
+#### 步骤5：使用共享资源
+现在所有Unity项目都可以：
+- 浏览共享资源库
+- 导入资源到各自项目
+- 上传新的风格化版本
+- 查看其他项目的资源使用情况
+
+### 场景2：本地开发模式
+
+适用于单人开发或不需要共享的场景。
+
+#### 步骤1：初始化本地数据库
+```powershell
+cd YourUnityProject
+dotnet run --project ../ArtAssetManager.Console -- init
+```
+
+#### 步骤2：在Unity中使用
+1. 打开 `Window > Art Asset Manager > Database Config`
+2. 使用默认的本地配置
+3. 或点击 "Local Mode" 快速设置
+
+### 配置文件示例
+
+#### 本地模式配置
+```json
+{
+  "DatabasePath": "art_asset_manager.db",
+  "IsSharedDatabase": false,
+  "ProjectName": "MyUnityProject",
+  "ProjectPath": "Assets",
+  "ConnectionTimeout": 30,
+  "ReadOnly": false
+}
+```
+
+#### 共享模式配置
+```json
+{
+  "DatabasePath": "\\\\CompanyServer\\SharedAssets\\art_asset_manager.db",
+  "IsSharedDatabase": true,
+  "ProjectName": "ProjectA",
+  "ProjectPath": "Assets",
+  "ConnectionTimeout": 30,
+  "ReadOnly": false
+}
+```
+
+### 权限管理
+
+#### 读写权限
+- 默认所有用户都有读写权限
+- 可以通过设置 `ReadOnly: true` 限制为只读模式
+- 适合只需要浏览和导入资源的用户
+
+#### 网络权限
+确保所有用户对共享文件夹有适当的权限：
+- 读取权限：可以浏览和导入资源
+- 写入权限：可以上传新资源和创建风格化版本
+
+### 性能优化
+
+#### 网络延迟
+- 共享数据库通过网络访问，可能有延迟
+- 建议使用高速局域网
+- 可以调整 `ConnectionTimeout` 参数
+
+#### 缓存策略
+- Unity扩展会缓存查询结果
+- 点击 "Refresh" 按钮更新缓存
+- 资源文件导入后会复制到本地Unity项目
+
+### 故障排除
+
+#### 问题：无法连接到共享数据库
+
+**解决方案**：
+1. 检查网络连接和共享文件夹权限
+2. 确认UNC路径格式正确：`\\Server\Share\file.db`
+3. 尝试在文件资源管理器中直接访问该路径
+4. 检查防火墙设置
+
+#### 问题：多个项目数据混淆
+
+**解决方案**：
+1. 确保每个Unity项目使用不同的 `ProjectName`
+2. 检查路由表中的 `project_id` 字段
+3. 使用数据库配置窗口的 "Test Connection" 验证配置
+
+#### 问题：配置文件不生效
+
+**解决方案**：
+1. 确认配置文件位于Unity项目根目录：`YourUnityProject/database-config.json`
+2. 检查JSON格式是否正确
+3. 重新打开Unity编辑器窗口
+4. 查看Unity Console中的错误信息
 
 ## 技术说明
 

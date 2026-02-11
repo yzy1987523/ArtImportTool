@@ -33,6 +33,34 @@ namespace ArtAssetManager.Unity.Editor
 
         private void FindDatabase()
         {
+            // 优先从配置文件加载
+            string configPath = Path.Combine(Application.dataPath, "..", "database-config.json");
+            if (File.Exists(configPath))
+            {
+                try
+                {
+                    var config = ArtAssetManager.Core.Configuration.DatabaseConfig.LoadFromFile(configPath);
+                    var validation = config.Validate();
+                    if (validation.IsValid)
+                    {
+                        _dbPath = config.GetFullDatabasePath();
+                        _statusMessage = config.IsSharedDatabase 
+                            ? $"Shared database: {_dbPath} (Project: {config.ProjectName})"
+                            : $"Local database: {_dbPath}";
+                        return;
+                    }
+                    else
+                    {
+                        _statusMessage = $"Config validation failed: {validation.ErrorMessage}";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _statusMessage = $"Failed to load config: {ex.Message}";
+                }
+            }
+
+            // 回退到默认查找逻辑
             string currentPath = Application.dataPath;
             for (int i = 0; i < 5; i++)
             {
@@ -46,7 +74,7 @@ namespace ArtAssetManager.Unity.Editor
                 currentPath = Directory.GetParent(currentPath)?.FullName;
                 if (currentPath == null) break;
             }
-            _statusMessage = "Database not found";
+            _statusMessage = "Database not found. Use Window > Art Asset Manager > Database Config to configure.";
         }
 
         private void LoadStyles()

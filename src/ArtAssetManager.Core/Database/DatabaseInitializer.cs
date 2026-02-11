@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using ArtAssetManager.Core.Configuration;
 
 namespace ArtAssetManager.Core.Database;
 
@@ -12,6 +13,22 @@ public class DatabaseInitializer
     public DatabaseInitializer(string databasePath)
     {
         _connectionString = $"Data Source={databasePath}";
+    }
+
+    /// <summary>
+    /// 从配置文件创建初始化器
+    /// </summary>
+    public static DatabaseInitializer FromConfig(string configPath)
+    {
+        var config = DatabaseConfig.LoadFromFile(configPath);
+        var validation = config.Validate();
+        
+        if (!validation.IsValid)
+        {
+            throw new InvalidOperationException($"Invalid database configuration: {validation.ErrorMessage}");
+        }
+
+        return new DatabaseInitializer(config.GetFullDatabasePath());
     }
 
     /// <summary>
