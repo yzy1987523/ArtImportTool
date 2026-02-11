@@ -99,7 +99,7 @@ ArtAssetManager/
 
 ### 前置要求
 
-- .NET 6.0 SDK 或更高版本
+- .NET 8.0 SDK 或更高版本
 - Visual Studio 2022 或 JetBrains Rider（可选）
 
 ### 安装依赖
@@ -184,7 +184,7 @@ dotnet test --filter "FullyQualifiedName~DatabaseSchemaTests"
 
 ## 技术栈
 
-- **.NET 6.0** - 核心框架
+- **.NET 8.0** - 核心框架
 - **SQLite 3.x** - 数据库（开发阶段）
 - **Dapper** - 轻量级ORM
 - **xUnit** - 单元测试框架
