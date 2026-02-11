@@ -1,14 +1,10 @@
-using Dapper.Contrib.Extensions;
-
 namespace ArtAssetManager.Core.Models;
 
 /// <summary>
-/// Tag实体
+/// 标签实体
 /// </summary>
-[Table("Tags")]
 public class Tag
 {
-    [Key]
     public int Id { get; set; }
     
     public string Name { get; set; } = string.Empty;

@@ -165,4 +165,44 @@ public class AssetRepository
         var affected = await connection.ExecuteAsync(sql, new { Id = id, UpdatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds() });
         return affected > 0;
     }
+
+    /// <summary>
+    /// 按标签查询资源（单个标签）
+    /// </summary>
+    public async Task<List<Asset>> GetByTagAsync(int tagId)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+        
+        var sql = @"
+            SELECT a.* FROM ArtAssets a
+            INNER JOIN AssetTags at ON a.id = at.asset_id
+            WHERE at.tag_id = @TagId AND a.is_deleted = 0
+            ORDER BY a.created_at DESC";
+        
+        var results = await connection.QueryAsync<Asset>(sql, new { TagId = tagId });
+        return results.ToList();
+    }
+
+    /// <summary>
+    /// 按标签组合查询资源（AND逻辑：资源必须包含所有指定标签）
+    /// </summary>
+    public async Task<List<Asset>> GetByTagsAsync(List<int> tagIds)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+        
+        var sql = @"
+            SELECT a.* FROM ArtAssets a
+            WHERE a.is_deleted = 0
+            AND (
+                SELECT COUNT(DISTINCT at.tag_id)
+                FROM AssetTags at
+                WHERE at.asset_id = a.id AND at.tag_id IN @TagIds
+            ) = @TagCount
+            ORDER BY a.created_at DESC";
+        
+        var results = await connection.QueryAsync<Asset>(sql, new { TagIds = tagIds, TagCount = tagIds.Count });
+        return results.ToList();
+    }
 }
