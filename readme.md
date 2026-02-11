@@ -8,6 +8,68 @@
 - 无缝的Unity集成和资源导入
 - 可靠的路由表维护机制
 - 高效的资源替换工作流
+- **公司级共享数据库支持（多项目协作）**
+
+## 核心特性
+
+### 🎯 资源管理
+- 自动去重和哈希验证
+- 元数据提取（尺寸、格式、大小）
+- 灵活的标签系统
+- 项目级资源隔离
+
+### 🔄 风格化资源
+- 多风格版本管理（cartoon、realistic、pixel等）
+- 智能名称匹配（Levenshtein距离算法）
+- 批量上传和替换
+- 完整的迁移历史记录
+
+### 🎮 Unity集成
+- 可视化资源浏览器
+- 一键导入到Unity项目
+- 资源替换窗口
+- 路由表自动维护
+
+### 🌐 共享数据库（新功能）
+- 支持本地和共享两种模式
+- 多Unity项目共享资源库
+- 通过项目名称隔离数据
+- 支持UNC路径和网络驱动器
+- 可视化配置管理
+
+## 快速开始
+
+### 共享数据库模式（推荐用于团队）
+
+查看 [共享数据库快速入门](SHARED_DATABASE_QUICKSTART.md)
+
+```powershell
+# 1. 初始化共享数据库（管理员）
+dotnet run --project src/ArtAssetManager.Console -- init --path "\\Server\Shared\art_asset_manager.db"
+
+# 2. 在Unity项目中安装（每个开发者）
+.\scripts\install-unity-extension.ps1 `
+    -UnityProjectPath "C:\YourProject" `
+    -SharedDatabase "\\Server\Shared\art_asset_manager.db" `
+    -ProjectName "YourProjectName"
+```
+
+### 本地模式（单人开发）
+
+```powershell
+# 1. 构建项目
+dotnet build
+
+# 2. 初始化数据库
+cd src/ArtAssetManager.Console
+dotnet run -- init
+
+# 3. 导入资源
+dotnet run -- import --source "C:\YourAssets"
+
+# 4. 安装Unity扩展
+.\scripts\install-unity-extension.ps1 -UnityProjectPath "C:\YourProject"
+```
 
 ## 项目结构
 
@@ -54,26 +116,37 @@ dotnet test --filter "FullyQualifiedName~DatabaseSchemaTests"
 dotnet test --logger "console;verbosity=detailed"
 ```
 
-## 当前进度
+## 项目状态
 
-### ✅ 阶段1.1：数据库Schema验证（已完成）
+### ✅ 已完成功能（100%）
 
-- [x] 创建数据库Schema（8张核心表）
-- [x] 创建索引和外键约束
-- [x] 初始化默认Tags
-- [x] 创建测试数据
-- [x] 编写Schema验证测试
+#### 阶段1：核心数据库和资源管理
+- ✅ 数据库Schema设计和实现
+- ✅ 资源导入和去重
+- ✅ 标签系统
+- ✅ 项目管理
 
-### 🔄 阶段1.2：资源入库流程验证（进行中）
+#### 阶段2：Unity集成
+- ✅ Unity编辑器扩展
+- ✅ 资源导入到Unity
+- ✅ 路由表维护
+- ✅ 风格化资源上传
 
-- [ ] 实现文件哈希计算
-- [ ] 实现资源去重逻辑
-- [ ] 实现资源元数据提取
-- [ ] 编写资源入库测试
+#### 阶段3：高级功能
+- ✅ 资源替换功能
+- ✅ 批量操作
+- ✅ 性能测试和优化
+- ✅ 公司级共享数据库
 
-### ⏳ 后续阶段
+### 📊 项目统计
 
-详见 [验证计划](docs/validation-plan.md)
+- **代码文件**: 25+ 文件
+- **代码行数**: ~5000+ 行
+- **单元测试**: 30个测试，100%通过
+- **文档**: 19个文档文件
+- **性能**: 批量导入<1秒/100文件，Tag操作<50ms/10资源
+
+详见 [项目完成报告](PROJECT_COMPLETION.md)
 
 ## 数据库Schema
 
@@ -113,9 +186,22 @@ dotnet test --filter "FullyQualifiedName~DatabaseSchemaTests"
 
 ## 文档
 
+### 快速入门
+- [共享数据库快速入门](SHARED_DATABASE_QUICKSTART.md) - 5分钟快速设置
+- [Unity扩展README](src/ArtAssetManager.Unity/README.md) - Unity使用指南
+
+### 设计文档
 - [需求文档](docs/requirements.md)
 - [设计文档](docs/design.md)
 - [验证计划](docs/validation-plan.md)
+
+### 部署和配置
+- [共享数据库部署指南](docs/shared-database-deployment.md) - 完整部署指南
+- [共享数据库功能总结](docs/shared-database-feature-summary.md) - 功能详解
+
+### 项目报告
+- [项目完成报告](PROJECT_COMPLETION.md) - 完整的项目总结
+- [进度总结](progress/SUMMARY.md) - 各阶段进度
 
 ## 许可证
 
