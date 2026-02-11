@@ -55,23 +55,12 @@ YourUnityProject/
 
 ### 配置数据库
 
-在Unity编辑器中，选择菜单：
-```
-Window > Art Asset Manager > Database Config
-```
+Unity扩展使用默认的数据库查找逻辑：
+1. 从Unity项目的 `Assets` 目录开始
+2. 向上查找最多5级目录
+3. 查找名为 `art_asset_manager.db` 的文件
 
-#### 本地模式（默认）
-- 数据库文件位于Unity项目根目录
-- 每个Unity项目有独立的数据库
-- 适合单人开发或小型项目
-
-#### 共享模式（公司级）
-- 数据库文件位于公司共享位置（网络驱动器或服务器）
-- 多个Unity项目共享同一个数据库
-- 通过项目名称隔离不同项目的数据
-- 适合团队协作和资源复用
-
-配置文件位置：`YourUnityProject/database-config.json`
+**注意**：Unity扩展不支持共享数据库配置功能。如需使用共享数据库，请使用控制台应用。
 
 ### 打开资源浏览器
 
@@ -165,9 +154,8 @@ Window > Art Asset Manager > Style Upload
 - ✅ 风格化资源上传（StyleUploadWindow）
 - ✅ 批量操作支持
 - ✅ 历史记录查看
-- ✅ 数据库配置窗口（DatabaseConfigWindow）
-- ✅ 共享数据库支持（公司级）
-- ✅ 本地/共享模式切换
+- ✅ 共享数据库支持（通过控制台应用）
+- ✅ 本地数据库自动查找
 
 ## 共享数据库部署指南
 
@@ -193,14 +181,14 @@ dotnet run -- init --path "\\CompanyServer\SharedAssets\art_asset_manager.db"
 dotnet run -- import --path "\\CompanyServer\SharedAssets\art_asset_manager.db" --source "C:\ArtAssets"
 ```
 
-#### 步骤4：在Unity项目中配置
+#### 步骤4：在Unity项目中使用
 在每个Unity项目中：
-1. 打开 `Window > Art Asset Manager > Database Config`
-2. 选择 "Shared Database (Company-level)"
-3. 设置数据库路径：`\\CompanyServer\SharedAssets\art_asset_manager.db`
-4. 设置项目名称（用于隔离不同项目）：如 "ProjectA"、"ProjectB"
-5. 点击 "Test Connection" 验证连接
-6. 点击 "Save Configuration"
+1. 将共享数据库文件复制到Unity项目根目录或上级目录
+2. 安装Unity扩展（使用安装脚本）
+3. Unity扩展会自动找到数据库文件
+4. 打开 `Window > Art Asset Manager > Asset Browser` 开始使用
+
+**注意**：Unity扩展不支持共享数据库配置功能。共享数据库功能仅在控制台应用中可用。
 
 #### 步骤5：使用共享资源
 现在所有Unity项目都可以：
@@ -220,9 +208,9 @@ dotnet run --project ../ArtAssetManager.Console -- init
 ```
 
 #### 步骤2：在Unity中使用
-1. 打开 `Window > Art Asset Manager > Database Config`
-2. 使用默认的本地配置
-3. 或点击 "Local Mode" 快速设置
+1. 将数据库文件复制到Unity项目根目录
+2. 安装Unity扩展
+3. 打开资源浏览器开始使用
 
 ### 配置文件示例
 

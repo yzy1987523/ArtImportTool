@@ -30,16 +30,19 @@
 - 资源替换窗口
 - 路由表自动维护
 
-### 🌐 共享数据库（新功能）
+### 🌐 共享数据库（控制台应用）
+
 - 支持本地和共享两种模式
 - 多Unity项目共享资源库
 - 通过项目名称隔离数据
 - 支持UNC路径和网络驱动器
-- 可视化配置管理
+- 可视化配置管理（仅控制台应用）
+
+**注意**：共享数据库功能仅在控制台应用中可用。Unity扩展使用默认的数据库查找逻辑。
 
 ## 快速开始
 
-### 共享数据库模式（推荐用于团队）
+### 共享数据库模式（控制台应用）
 
 查看 [共享数据库快速入门](SHARED_DATABASE_QUICKSTART.md)
 
@@ -47,11 +50,13 @@
 # 1. 初始化共享数据库（管理员）
 dotnet run --project src/ArtAssetManager.Console -- init --path "\\Server\Shared\art_asset_manager.db"
 
-# 2. 在Unity项目中安装（每个开发者）
-.\scripts\install-unity-extension.ps1 `
-    -UnityProjectPath "C:\YourProject" `
-    -SharedDatabase "\\Server\Shared\art_asset_manager.db" `
-    -ProjectName "YourProjectName"
+# 2. 导入资源到共享数据库
+dotnet run --project src/ArtAssetManager.Console -- import --path "\\Server\Shared\art_asset_manager.db" --source "C:\YourAssets"
+
+# 3. 在Unity项目中使用
+# 将共享数据库文件复制到Unity项目根目录或上级目录
+# Unity扩展会自动找到数据库文件
+.\scripts\install-unity-extension.ps1 -UnityProjectPath "C:\YourProject"
 ```
 
 ### 本地模式（单人开发）

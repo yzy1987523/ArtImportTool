@@ -24,22 +24,19 @@ dotnet run -- init --path "\\CompanyServer\SharedAssets\art_asset_manager.db"
 dotnet run -- import --path "\\CompanyServer\SharedAssets\art_asset_manager.db" --source "C:\CompanyAssets"
 ```
 
-### 步骤4：在Unity项目中安装（每个开发者）
+### 步骤4：在Unity项目中使用
 
+1. 将共享数据库文件复制到Unity项目根目录或上级目录
+2. 安装Unity扩展：
 ```powershell
-cd ArtAssetManager
-.\scripts\install-unity-extension.ps1 `
-    -UnityProjectPath "C:\YourUnityProject" `
-    -SharedDatabase "\\CompanyServer\SharedAssets\art_asset_manager.db" `
-    -ProjectName "YourProjectName"
+.\scripts\install-unity-extension.ps1 -UnityProjectPath "C:\YourUnityProject"
 ```
+3. 打开Unity项目
+4. 等待编译完成
+5. 打开 `Window > Art Asset Manager > Asset Browser`
+6. 开始浏览和导入资源！
 
-### 步骤5：在Unity中使用
-
-1. 打开Unity项目
-2. 等待编译完成
-3. 打开 `Window > Art Asset Manager > Asset Browser`
-4. 开始浏览和导入资源！
+**注意**：Unity扩展不支持共享数据库配置功能。共享数据库功能仅在控制台应用中可用。
 
 ## 常用操作
 
