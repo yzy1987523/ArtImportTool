@@ -60,7 +60,21 @@ YourUnityProject/
 Window > Art Asset Manager > Asset Browser
 ```
 
+### 打开资源替换窗口
+
+```
+Window > Art Asset Manager > Asset Replacement
+```
+
+### 打开风格化上传窗口
+
+```
+Window > Art Asset Manager > Style Upload
+```
+
 ### 功能说明
+
+#### 1. 资源浏览器（Asset Browser）
 
 1. **搜索资源**
    - 在搜索框中输入资源名称进行搜索
@@ -74,22 +88,63 @@ Window > Art Asset Manager > Asset Browser
    - 点击"Info"按钮查看资源详细信息
    - 包括ID、名称、类型、大小、尺寸、创建时间
 
-4. **导入资源**（待实现）
+4. **导入资源**
    - 点击"Import"按钮将资源导入到Unity项目
-   - 当前版本会显示提示信息
+   - 选择导入路径
+   - 自动创建路由表记录
 
 5. **刷新列表**
    - 点击"Refresh"按钮重新加载资源列表
 
+#### 2. 资源替换窗口（Asset Replacement）
+
+1. **查看Unity资源**
+   - 显示所有已导入Unity的资源
+   - 显示每个资源的可用风格化版本
+
+2. **按风格筛选**
+   - 使用风格下拉菜单筛选
+   - 只显示特定风格的版本
+
+3. **替换资源**
+   - 点击"Replace"按钮替换资源
+   - 自动更新Unity文件
+   - 自动更新路由表
+
+4. **查看历史**
+   - 点击"View History"查看替换历史
+   - 显示最近10次操作
+
+#### 3. 风格化上传窗口（Style Upload）
+
+1. **选择风格标签**
+   - 从下拉菜单选择风格（cartoon、realistic、pixel等）
+
+2. **选择文件**
+   - 点击"Select Files"选择要上传的文件
+   - 支持多次选择
+
+3. **预览匹配**
+   - 点击"Preview Matches"查看匹配结果
+   - 绿色=精确匹配，黄色=高相似度，红色=低相似度
+
+4. **批量上传**
+   - 点击"Upload All"批量上传所有文件
+   - 自动导入到数据库
+   - 自动创建风格迁移记录
+
 ## 当前状态
 
-- ✅ 资源浏览窗口
+- ✅ 资源浏览窗口（AssetBrowserWindow）
 - ✅ 搜索功能
 - ✅ 标签筛选
 - ✅ 资源信息显示
-- ⏳ 资源导入功能（Stage 2.2）
-- ⏳ 路由表维护（Stage 2.3）
-- ⏳ 风格化资源上传（Stage 2.4）
+- ✅ 资源导入功能
+- ✅ 路由表维护
+- ✅ 资源替换窗口（AssetReplacementWindow）
+- ✅ 风格化资源上传（StyleUploadWindow）
+- ✅ 批量操作支持
+- ✅ 历史记录查看
 
 ## 技术说明
 
@@ -137,10 +192,10 @@ Window > Art Asset Manager > Asset Browser
 
 ## 下一步开发
 
-- [ ] 实现资源导入功能（Stage 2.2）
-- [ ] 实现路由表维护（Stage 2.3）
-- [ ] 实现风格化资源上传（Stage 2.4）
-- [ ] 添加资源预览功能
-- [ ] 添加批量导入功能
-- [ ] 添加项目管理界面
+- [ ] 添加资源预览功能（缩略图）
+- [ ] 添加分页功能
+- [ ] 添加排序功能
+- [ ] 添加多选功能
+- [ ] 添加拖拽导入功能
+- [ ] 性能优化和压力测试
 

@@ -280,9 +280,191 @@ namespace ArtAssetManager.Unity.Editor
 
         private void ImportAsset(AssetItem asset)
         {
-            EditorUtility.DisplayDialog("Import Asset", 
-                $"Import functionality will be implemented in Stage 2.2\n\nAsset: {asset.Name}", 
-                "OK");
+            // 选择导入路径
+            string defaultPath = "Assets/ImportedAssets";
+            string importPath = EditorUtility.SaveFilePanelInProject(
+                "Import Asset",
+                asset.Name,
+                asset.FileType,
+                "Select where to import the asset",
+                defaultPath
+            );
+
+            if (string.IsNullOrEmpty(importPath))
+            {
+                return; // 用户取消
+            }
+
+            try
+            {
+                // 获取资源文件路径
+                string sourceFilePath = GetAssetFilePath(asset.Id);
+                if (string.IsNullOrEmpty(sourceFilePath) || !File.Exists(sourceFilePath))
+                {
+                    EditorUtility.DisplayDialog("Error", "Source file not found", "OK");
+                    return;
+                }
+
+                // 复制文件到Unity项目
+                string targetPath = Path.Combine(Application.dataPath, "..", importPath);
+                File.Copy(sourceFilePath, targetPath, true);
+
+                // 刷新资源数据库
+                AssetDatabase.Refresh();
+
+                // 获取Unity GUID
+                string unityGuid = AssetDatabase.AssetPathToGUID(importPath);
+
+                // 创建路由表记录
+                CreateRouteRecord(asset.Id, unityGuid, importPath, asset.Name);
+
+                _statusMessage = $"Asset imported successfully: {importPath}";
+                EditorUtility.DisplayDialog("Success", 
+                    $"Asset imported successfully!\n\nPath: {importPath}\nGUID: {unityGuid}", 
+                    "OK");
+            }
+            catch (Exception ex)
+            {
+                _statusMessage = $"Import failed: {ex.Message}";
+                EditorUtility.DisplayDialog("Error", $"Failed to import asset:\n{ex.Message}", "OK");
+            }
+        }
+
+        private string GetAssetFilePath(string assetId)
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={_dbPath}"))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "SELECT file_path FROM ArtAssets WHERE id = @Id";
+                        command.Parameters.AddWithValue("@Id", assetId);
+                        var result = command.ExecuteScalar();
+                        return result?.ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to get asset file path: {ex.Message}");
+                return null;
+            }
+        }
+
+        private void CreateRouteRecord(string assetId, string unityGuid, string unityPath, string unityName)
+        {
+            try
+            {
+                // 获取或创建默认项目
+                string projectId = GetOrCreateDefaultProject();
+
+                using (var connection = new SqliteConnection($"Data Source={_dbPath}"))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        var routeId = Guid.NewGuid().ToString();
+                        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+                        command.CommandText = @"
+                            INSERT INTO UnityRoutes (id, asset_id, project_id, unity_guid, unity_path, 
+                                                    unity_name, original_import_path, is_active, 
+                                                    created_at, updated_at)
+                            VALUES (@Id, @AssetId, @ProjectId, @UnityGuid, @UnityPath, 
+                                    @UnityName, @OriginalImportPath, 1, @CreatedAt, @UpdatedAt)";
+
+                        command.Parameters.AddWithValue("@Id", routeId);
+                        command.Parameters.AddWithValue("@AssetId", assetId);
+                        command.Parameters.AddWithValue("@ProjectId", projectId);
+                        command.Parameters.AddWithValue("@UnityGuid", unityGuid);
+                        command.Parameters.AddWithValue("@UnityPath", unityPath);
+                        command.Parameters.AddWithValue("@UnityName", unityName);
+                        command.Parameters.AddWithValue("@OriginalImportPath", unityPath);
+                        command.Parameters.AddWithValue("@CreatedAt", now);
+                        command.Parameters.AddWithValue("@UpdatedAt", now);
+
+                        command.ExecuteNonQuery();
+
+                        // 记录历史
+                        CreateRouteHistory(connection, routeId, assetId, unityPath, "create", now);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to create route record: {ex.Message}");
+            }
+        }
+
+        private string GetOrCreateDefaultProject()
+        {
+            try
+            {
+                using (var connection = new SqliteConnection($"Data Source={_dbPath}"))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        // 查找默认项目
+                        command.CommandText = "SELECT id FROM Projects WHERE name = @Name LIMIT 1";
+                        command.Parameters.AddWithValue("@Name", "UnityImport");
+                        var result = command.ExecuteScalar();
+
+                        if (result != null)
+                        {
+                            return result.ToString();
+                        }
+
+                        // 创建默认项目
+                        var projectId = Guid.NewGuid().ToString();
+                        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+                        command.CommandText = @"
+                            INSERT INTO Projects (id, name, description, unity_path, created_at, updated_at, is_deleted)
+                            VALUES (@Id, @Name, @Description, @UnityPath, @CreatedAt, @UpdatedAt, 0)";
+
+                        command.Parameters.Clear();
+                        command.Parameters.AddWithValue("@Id", projectId);
+                        command.Parameters.AddWithValue("@Name", "UnityImport");
+                        command.Parameters.AddWithValue("@Description", "Default project for Unity imports");
+                        command.Parameters.AddWithValue("@UnityPath", "Assets/ImportedAssets");
+                        command.Parameters.AddWithValue("@CreatedAt", now);
+                        command.Parameters.AddWithValue("@UpdatedAt", now);
+
+                        command.ExecuteNonQuery();
+                        return projectId;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to get or create default project: {ex.Message}");
+                return Guid.NewGuid().ToString();
+            }
+        }
+
+        private void CreateRouteHistory(SqliteConnection connection, string routeId, string assetId, 
+                                       string unityPath, string action, long timestamp)
+        {
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"
+                    INSERT INTO RouteHistory (id, route_id, new_asset_id, new_unity_path, 
+                                             action, created_at, created_by)
+                    VALUES (@Id, @RouteId, @NewAssetId, @NewUnityPath, @Action, @CreatedAt, @CreatedBy)";
+
+                command.Parameters.AddWithValue("@Id", Guid.NewGuid().ToString());
+                command.Parameters.AddWithValue("@RouteId", routeId);
+                command.Parameters.AddWithValue("@NewAssetId", assetId);
+                command.Parameters.AddWithValue("@NewUnityPath", unityPath);
+                command.Parameters.AddWithValue("@Action", action);
+                command.Parameters.AddWithValue("@CreatedAt", timestamp);
+                command.Parameters.AddWithValue("@CreatedBy", "Unity Editor");
+
+                command.ExecuteNonQuery();
+            }
         }
 
         private void ShowAssetInfo(AssetItem asset)
