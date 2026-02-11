@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.Data.Sqlite;
 using ArtAssetManager.Core.Models;
 using ArtAssetManager.Core.Repositories;
 
@@ -16,24 +17,24 @@ namespace ArtAssetManager.Core.Services
         public StyleMigrationService(IDbConnection connection)
         {
             _migrationRepository = new StyleMigrationRepository(connection);
-            _assetRepository = new AssetRepository(connection);
+            _assetRepository = new AssetRepository($"Data Source={((SqliteConnection)connection).DataSource}");
             _nameMatchingService = new NameMatchingService();
         }
 
         /// <summary>
         /// 上传风格化资源并自动匹配原始资源
         /// </summary>
-        public (StyleMigration Migration, NameMatchingService.MatchResult Match) UploadStyledAsset(
-            string styledAssetId, string styleTag, string projectId = null)
+        public (StyleMigration? Migration, NameMatchingService.MatchResult? Match) UploadStyledAsset(
+            string styledAssetId, string styleTag, string? projectId = null)
         {
-            var styledAsset = _assetRepository.GetAssetById(styledAssetId);
+            var styledAsset = _assetRepository.GetByIdAsync(styledAssetId).Result;
             if (styledAsset == null)
             {
                 throw new ArgumentException("Styled asset not found");
             }
 
             // 获取所有带org标签的资源作为候选
-            var orgAssets = _assetRepository.GetAssetsByTag("org");
+            var orgAssets = _assetRepository.GetByTagAsync(1).Result; // org tag id = 1
             var candidates = orgAssets.Select(a => (a.Id, a.Name)).ToList();
 
             // 规范化名称并查找最佳匹配
@@ -66,7 +67,7 @@ namespace ArtAssetManager.Core.Services
         /// 手动创建风格迁移关联
         /// </summary>
         public StyleMigration CreateMigration(string originalAssetId, string styledAssetId, 
-                                             string styleTag, string projectId = null)
+                                             string styleTag, string? projectId = null)
         {
             var migration = new StyleMigration
             {

@@ -8,8 +8,8 @@ namespace ArtAssetManager.Core.Services
     {
         public class MatchResult
         {
-            public string AssetId { get; set; }
-            public string AssetName { get; set; }
+            public string AssetId { get; set; } = string.Empty;
+            public string AssetName { get; set; } = string.Empty;
             public int Distance { get; set; }
             public double Similarity { get; set; }
             public bool IsExactMatch { get; set; }
