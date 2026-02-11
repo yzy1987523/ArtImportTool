@@ -1,14 +1,10 @@
-using Dapper.Contrib.Extensions;
-
 namespace ArtAssetManager.Core.Models;
 
 /// <summary>
-/// Project实体
+/// 项目实体
 /// </summary>
-[Table("Projects")]
 public class Project
 {
-    [Key]
     public string Id { get; set; } = string.Empty;
     
     public string Name { get; set; } = string.Empty;
