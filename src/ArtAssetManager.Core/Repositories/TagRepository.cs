@@ -13,15 +13,14 @@ public class TagRepository
     
     static TagRepository()
     {
-        // 配置Dapper列名映射：snake_case -> PascalCase
         SqlMapper.SetTypeMap(typeof(Tag), new CustomPropertyTypeMap(
             typeof(Tag),
-            (type, columnName) => type.GetProperty(ConvertToPascalCase(columnName))
+            (type, columnName) => type.GetProperty(ConvertToPascalCase(columnName))!
         ));
         
         SqlMapper.SetTypeMap(typeof(AssetTag), new CustomPropertyTypeMap(
             typeof(AssetTag),
-            (type, columnName) => type.GetProperty(ConvertToPascalCase(columnName))
+            (type, columnName) => type.GetProperty(ConvertToPascalCase(columnName))!
         ));
     }
     

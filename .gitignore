@@ -3,6 +3,9 @@ bin/
 obj/
 out/
 
+# IDE / Tool Configuration
+.agent/
+
 # Visual Studio / Rider
 .vs/
 .vscode/

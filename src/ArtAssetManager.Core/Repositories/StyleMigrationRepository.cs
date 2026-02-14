@@ -37,7 +37,7 @@ namespace ArtAssetManager.Core.Repositories
                 FROM StyleMigrations 
                 WHERE id = @Id";
 
-            return _connection.QueryFirstOrDefault<StyleMigration>(sql, new { Id = id });
+            return _connection.QueryFirstOrDefault<StyleMigration>(sql, new { Id = id })!;
         }
 
         public List<StyleMigration> GetMigrationsByOriginalAsset(string originalAssetId)

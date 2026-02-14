@@ -37,11 +37,11 @@ public class FileHashCalculator
             try
             {
                 var hash = await CalculateHashAsync(path);
-                return new { Path = path, Hash = hash, Success = true, Error = (string?)null };
+                return (Path: path, Hash: hash, Success: true, Error: (string?)null);
             }
             catch (Exception ex)
             {
-                return new { Path = path, Hash = string.Empty, Success = false, Error = ex.Message };
+                return (Path: path, Hash: string.Empty, Success: false, Error: ex.Message);
             }
         });
         

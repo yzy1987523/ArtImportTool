@@ -13,10 +13,9 @@ public class AssetRepository
     
     static AssetRepository()
     {
-        // 配置Dapper列名映射：snake_case -> PascalCase
         SqlMapper.SetTypeMap(typeof(Asset), new CustomPropertyTypeMap(
             typeof(Asset),
-            (type, columnName) => type.GetProperty(ConvertToPascalCase(columnName))
+            (type, columnName) => type.GetProperty(ConvertToPascalCase(columnName))!
         ));
     }
     

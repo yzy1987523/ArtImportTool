@@ -23,7 +23,7 @@ namespace ArtAssetManager.Core.Services
         {
             if (string.IsNullOrEmpty(targetName) || candidates == null || candidates.Count == 0)
             {
-                return null;
+                return null!;
             }
 
             var results = new List<MatchResult>();
@@ -50,7 +50,7 @@ namespace ArtAssetManager.Core.Services
             // 如果距离太大，返回null
             if (bestMatch.Distance > maxDistance && !bestMatch.IsExactMatch)
             {
-                return null;
+                return null!;
             }
 
             return bestMatch;

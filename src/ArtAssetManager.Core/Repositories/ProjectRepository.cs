@@ -13,15 +13,14 @@ public class ProjectRepository
     
     static ProjectRepository()
     {
-        // 配置Dapper列名映射：snake_case -> PascalCase
         SqlMapper.SetTypeMap(typeof(Project), new CustomPropertyTypeMap(
             typeof(Project),
-            (type, columnName) => type.GetProperty(ConvertToPascalCase(columnName))
+            (type, columnName) => type.GetProperty(ConvertToPascalCase(columnName))!
         ));
         
         SqlMapper.SetTypeMap(typeof(ProjectAsset), new CustomPropertyTypeMap(
             typeof(ProjectAsset),
-            (type, columnName) => type.GetProperty(ConvertToPascalCase(columnName))
+            (type, columnName) => type.GetProperty(ConvertToPascalCase(columnName))!
         ));
     }
     

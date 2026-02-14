@@ -1,10 +1,11 @@
-using System.Drawing;
+using System.Runtime.Versioning;
 
 namespace ArtAssetManager.Core.Services;
 
 /// <summary>
 /// 资源元数据提取器
 /// </summary>
+[SupportedOSPlatform("windows")]
 public class AssetMetadataExtractor
 {
     private static readonly HashSet<string> ImageExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -38,12 +39,10 @@ public class AssetMetadataExtractor
             FileSize = fileInfo.Length
         };
 
-        // 提取图片元数据
         if (ImageExtensions.Contains(extension))
         {
             await ExtractImageMetadataAsync(filePath, metadata);
         }
-        // 提取音频元数据
         else if (AudioExtensions.Contains(extension))
         {
             await ExtractAudioMetadataAsync(filePath, metadata);
@@ -55,19 +54,19 @@ public class AssetMetadataExtractor
     /// <summary>
     /// 提取图片元数据
     /// </summary>
+    [SupportedOSPlatform("windows")]
     private async Task ExtractImageMetadataAsync(string filePath, AssetMetadata metadata)
     {
         await Task.Run(() =>
         {
             try
             {
-                using var image = Image.FromFile(filePath);
+                using var image = System.Drawing.Image.FromFile(filePath);
                 metadata.Width = image.Width;
                 metadata.Height = image.Height;
             }
             catch (Exception ex)
             {
-                // 如果无法读取图片信息，记录错误但不抛出异常
                 metadata.Metadata = $"{{\"error\": \"Failed to extract image metadata: {ex.Message}\"}}";
             }
         });

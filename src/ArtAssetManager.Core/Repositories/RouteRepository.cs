@@ -51,7 +51,7 @@ namespace ArtAssetManager.Core.Repositories
                 FROM UnityRoutes 
                 WHERE id = @Id";
 
-            return _connection.QueryFirstOrDefault<UnityRoute>(sql, new { Id = id });
+            return _connection.QueryFirstOrDefault<UnityRoute>(sql, new { Id = id })!;
         }
 
         public UnityRoute GetRouteByGuid(string unityGuid)
@@ -64,7 +64,7 @@ namespace ArtAssetManager.Core.Repositories
                 FROM UnityRoutes 
                 WHERE unity_guid = @UnityGuid";
 
-            return _connection.QueryFirstOrDefault<UnityRoute>(sql, new { UnityGuid = unityGuid });
+            return _connection.QueryFirstOrDefault<UnityRoute>(sql, new { UnityGuid = unityGuid })!;
         }
 
         public List<UnityRoute> GetRoutesByAssetId(string assetId)

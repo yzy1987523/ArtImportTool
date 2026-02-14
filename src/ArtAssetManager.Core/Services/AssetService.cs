@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using ArtAssetManager.Core.Models;
 using ArtAssetManager.Core.Repositories;
 
@@ -6,6 +7,7 @@ namespace ArtAssetManager.Core.Services;
 /// <summary>
 /// 资源服务
 /// </summary>
+[SupportedOSPlatform("windows")]
 public class AssetService
 {
     private readonly AssetRepository _assetRepository;

@@ -1,9 +1,11 @@
-﻿using ArtAssetManager.Core.Database;
+﻿using System.Runtime.Versioning;
+using ArtAssetManager.Core.Database;
 using ArtAssetManager.Core.Repositories;
 using ArtAssetManager.Core.Services;
 
 namespace ArtAssetManager.Console;
 
+[SupportedOSPlatform("windows")]
 class Program
 {
     private static string _dbPath = "art_asset_manager.db";
